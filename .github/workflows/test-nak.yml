@@ -2,11 +2,13 @@ name: Test Nak Publication
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   test-nak:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [linux-amd64, linux-arm64, linux-riscv64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -14,8 +16,17 @@ jobs:
       - name: Install nak
         shell: bash
         run: |
-          go install -tags=debug github.com/fiatjaf/nak@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+          echo "Downloading nak for ${{ matrix.arch }}..."
+          curl -L "https://github.com/fiatjaf/nak/releases/download/v0.17.3/nak-v0.17.3-${{ matrix.arch }}" -o /usr/local/bin/nak
+          chmod +x /usr/local/bin/nak
+
+          # Verify installation
+          if nak --version; then
+            echo "✅ nak installed successfully"
+          else
+            echo "❌ nak installation failed"
+            exit 1
+            fi
 
       - name: Test nak event creation and publication
         shell: bash

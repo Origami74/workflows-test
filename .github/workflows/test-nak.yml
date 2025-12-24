@@ -1,3 +1,4 @@
+
 name: Test Nak Publication
 
 on:
@@ -7,9 +8,6 @@ on:
 jobs:
   test-nak:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [linux-amd64, linux-arm64, linux-riscv64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,31 +15,18 @@ jobs:
       - name: Install nak
         shell: bash
         run: |
-          echo "Downloading nak for ${{ matrix.arch }}..."
-          curl -L "https://github.com/fiatjaf/nak/releases/download/v0.17.3/nak-v0.17.3-${{ matrix.arch }}" -o /usr/local/bin/nak
-          chmod +x /usr/local/bin/nak
+          go install -tags=debug github.com/fiatjaf/nak@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
 
-          # Verify installation
-          if nak --version; then
-            echo "✅ nak installed successfully"
-          else
-            echo "❌ nak installation failed"
-            exit 1
-            fi
-
-      - name: Test nak event creation and publication
+      - name: Test nak req with limit 10 kind 1
         shell: bash
         env:
           RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom wss://relay.tollgate.me"
-          NSEC_HEX: ${{ secrets.NSEC_HEX }}
         run: |
           set -e  # Exit on any error
 
-          # Create a simple kind 1 note
-          echo "Creating test note..."
-          nak event --sec "$NSEC_HEX" -k 1 -c "Test note from GitHub Actions" > test.json 2> test.err
+          # Query kind 1 notes with limit 10
+          echo "Querying kind 1 notes..."
+          nak req -l 10 '{"kinds": [1]}' $RELAYS 2>&1
+          echo "Test query complete"
 
-          # Publish the note
-          echo "Publishing test note to relays..."
-          cat test.json | nak event $RELAYS 2>&1
-          echo "Test publish complete"

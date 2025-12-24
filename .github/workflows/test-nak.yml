@@ -2,6 +2,7 @@ name: Test Nak Publication
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   test-nak:

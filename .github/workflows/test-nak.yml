@@ -21,7 +21,7 @@ jobs:
       - name: Test nak req with limit 10 kind 1
         shell: bash
         env:
-          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom
+          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom"
         run: |
           set -e  # Exit on any error
 

@@ -2,6 +2,7 @@ name: Test Nak Publication
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   test-nak:
@@ -14,4 +15,21 @@ jobs:
         shell: bash
         run: |
           go install -tags=debug github.com/fiatjaf/nak@latest
-          nak event
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test nak event creation and publication
+        shell: bash
+        env:
+          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom wss://relay.tollgate.me"
+          NSEC_HEX: ${{ secrets.NSEC_HEX }}
+        run: |
+          set -e  # Exit on any error
+
+          # Create a simple kind 1 note
+          echo "Creating test note..."
+          nak event --sec "$NSEC_HEX" -k 1 -c "Test note from GitHub Actions" > test.json 2> test.err
+
+          # Publish the note
+          echo "Publishing test note to relays..."
+          cat test.json | nak event $RELAYS 2>&1
+          echo "Test publish complete"

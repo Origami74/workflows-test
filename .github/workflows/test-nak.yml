@@ -1,8 +1,12 @@
-
 name: Test Nak Publication
 
 on:
   workflow_dispatch:
+    inputs:
+      nak_version:
+        description: 'Version of nak to use'
+        required: true
+        default: 'v0.17.0'
   push:
 
 jobs:
@@ -12,16 +16,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install nak
+      - name: Download nak binary
         shell: bash
+        env:
+          NAK_VERSION: ${{ inputs.nak_version }}
         run: |
-          go install -tags=debug github.com/fiatjaf/nak@v0.17.0
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+          echo "Downloading nak binary for linux-amd64 version $NAK_VERSION..."
+          curl -L "https://github.com/fiatjaf/nak/releases/download/$NAK_VERSION/nak-$NAK_VERSION-linux-amd64" -o /usr/local/bin/nak
+          chmod +x /usr/local/bin/nak
 
       - name: Test nak req with limit 10 kind 1
         shell: bash
         env:
-          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom"
+          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom wss://relay.tollgate.me"
         run: |
           set -e  # Exit on any error
 
@@ -29,4 +36,3 @@ jobs:
           echo "Querying kind 1 notes..."
           nak req -l 10 -k 1 $RELAYS
           echo "Test query complete"
-

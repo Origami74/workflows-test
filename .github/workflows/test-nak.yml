@@ -15,7 +15,7 @@ jobs:
       - name: Install nak
         shell: bash
         run: |
-          go install -tags=debug github.com/fiatjaf/nak@latest
+          go install -tags=debug github.com/fiatjaf/nak@v0.16.2
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
       - name: Test nak req with limit 10 kind 1

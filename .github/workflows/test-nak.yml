@@ -21,12 +21,12 @@ jobs:
       - name: Test nak req with limit 10 kind 1
         shell: bash
         env:
-          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom wss://relay.tollgate.me"
+          RELAYS: "wss://relay.damus.io wss://nos.lol wss://nostr.mom
         run: |
           set -e  # Exit on any error
 
           # Query kind 1 notes with limit 10
           echo "Querying kind 1 notes..."
-          nak req -l 10 -k 1 $RELAYS 2>&1
+          nak req -l 10 -k 1 $RELAYS
           echo "Test query complete"
 

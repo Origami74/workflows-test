@@ -27,6 +27,6 @@ jobs:
 
           # Query kind 1 notes with limit 10
           echo "Querying kind 1 notes..."
-          nak req -l 10 '{"kinds": [1]}' $RELAYS 2>&1
+          nak req -l 10 -k 1 $RELAYS 2>&1
           echo "Test query complete"
 

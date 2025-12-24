@@ -15,7 +15,9 @@ jobs:
         run: |
           # Detect architecture
           ARCH=$(uname -m)
+          GO=$(go version)
           echo "Detected architecture: $ARCH"
+          echo "Detected go version: $GO"
 
           # Map to nak binary naming
           case "$ARCH" in
@@ -56,7 +58,7 @@ jobs:
 
           # Create a simple kind 1 note
           echo "Creating test note..."
-          nak event --sec "$NSEC_HEX" -k 1 -c "Test note from GitHub Actions" > test.json 2> test.err
+          nak event
 
           # Publish the note
           echo "Publishing test note to relays..."
